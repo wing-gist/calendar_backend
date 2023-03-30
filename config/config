@@ -1,0 +1,20 @@
+package config
+
+import (
+	"github.com/joho/godotenv"
+)
+
+func init() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+}
+
+func Get(key string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		log.Fatalf("Key %s not found", key)
+	}
+	return value
+}
