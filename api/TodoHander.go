@@ -37,7 +37,7 @@ func TodoPostHander(w http.ResponseWriter, r *http.Request) {
 	coll := database.GetCollection(client, "todos")
 	defer cancel()
 
-	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{"Title", todo.Title}, {"Description", todo.Description}, {"Date", todo.Date}})
+	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{Key: "Title", Value: todo.Title}, {Key: "Description", Value: todo.Description}, {Key: "Date", Value: todo.Date}})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

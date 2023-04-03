@@ -16,7 +16,7 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 	defer cancel()
 
 	filter := bson.D{}
-	opts := options.Find().SetProjection(bson.D{{"Email", 0}})
+	opts := options.Find().SetProjection(bson.D{{Key: "Email", Value: 0}})
 	Cursor, err := coll.Find(ctx, filter, opts)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -39,7 +39,7 @@ func UserPostHandler(w http.ResponseWriter, r *http.Request) {
 	coll := database.GetCollection(client, "users")
 	defer cancel()
 
-	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{"Nickname", user.Nickname}, {"Email", user.Email}})
+	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{Key: "Nickname", Value: user.Nickname}, {Key: "Email", Value: user.Email}})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
