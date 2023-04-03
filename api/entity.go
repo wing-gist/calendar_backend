@@ -19,6 +19,7 @@ type UserDatabase struct {
 	_id      string
 	Nickname string
 	Email    string
+	password string
 }
 
 type TodoDatabase struct {

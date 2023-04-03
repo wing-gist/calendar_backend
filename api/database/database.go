@@ -35,33 +35,3 @@ func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
 func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
 	return client.Database(os.Getenv("DATABASE_NAME")).Collection(collectionName)
 }
-
-func InsertOne(client *mongo.Client, collectionName string, document interface{}, ctx context.Context) (*mongo.InsertOneResult, error) {
-	collection := GetCollection(client, collectionName)
-
-	return collection.InsertOne(ctx, document)
-}
-
-func FindOne(client *mongo.Client, collectionName string, filter interface{}, ctx context.Context) *mongo.SingleResult {
-	collection := GetCollection(client, collectionName)
-
-	return collection.FindOne(ctx, filter)
-}
-
-func Find(client *mongo.Client, collectionName string, filter interface{}, ctx context.Context) (*mongo.Cursor, error) {
-	collection := GetCollection(client, collectionName)
-
-	return collection.Find(ctx, filter)
-}
-
-func UpdateOne(client *mongo.Client, collectionName string, filter interface{}, update interface{}, ctx context.Context) (*mongo.UpdateResult, error) {
-	collection := GetCollection(client, collectionName)
-
-	return collection.UpdateOne(ctx, filter, update)
-}
-
-func DeleteOne(client *mongo.Client, collectionName string, filter interface{}, ctx context.Context) (*mongo.DeleteResult, error) {
-	collection := GetCollection(client, collectionName)
-
-	return collection.DeleteOne(ctx, filter)
-}
