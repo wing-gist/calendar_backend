@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"calendar/api/database"
+	"calendar/database"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
