@@ -4,9 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"os"
+	"time"
 
 	"calendar/database"
 
+	"github.com/dgrijalva/jwt-go/v4"
+	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -61,5 +65,21 @@ func ValidateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(UserFromDB)
+	preAuthToken := AuthtokenClaims{
+		TokenUUID: uuid.NewString(),
+		UserID:    UserFromDB.ID.String(),
+		Nickname:  UserFromDB.Nickname,
+		StandardClaims: jwt.StandardClaims{
+			ExpiresAt: jwt.At(time.Now().Add(time.Minute * 15)),
+		},
+	}
+
+	authToken := jwt.NewWithClaims(jwt.SigningMethodHS256, preAuthToken)
+	signedAuthToken, err := authToken.SignedString([]byte(os.Getenv("JWT_SECRET")))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	json.NewEncoder(w).Encode(signedAuthToken)
 }

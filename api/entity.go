@@ -2,12 +2,15 @@ package api
 
 import (
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type User struct {
-	Nickname  string `json:"nickname" bson:"nickname"`
-	Email     string `json:"email" bson:"email"`
-	Passsword []byte `json:"password" bson:"password"`
+	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Nickname  string             `json:"nickname" bson:"nickname"`
+	Email     string             `json:"email" bson:"email"`
+	Passsword []byte             `json:"password" bson:"password"`
 }
 
 type Todo struct {

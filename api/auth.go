@@ -7,5 +7,6 @@ import (
 type AuthtokenClaims struct {
 	TokenUUID string `json:"token_uuid"`
 	UserID    string `json:"user_id"`
+	Nickname  string `json:"nickname"`
 	jwt.StandardClaims
 }

@@ -11,9 +11,7 @@ import (
 )
 
 func TodoGetHandler(w http.ResponseWriter, r *http.Request) {
-	coll := database.GetCollection("todos")
-
-	Cursor, err := coll.Find(context.Background(), bson.D{{}})
+	Cursor, err := database.Find("todos", bson.D{})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
