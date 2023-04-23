@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -10,18 +11,16 @@ import (
 )
 
 func TodoGetHandler(w http.ResponseWriter, r *http.Request) {
-	client, ctx, cancel := database.Connect()
-	coll := database.GetCollection(client, "todos")
-	defer cancel()
+	coll := database.GetCollection("todos")
 
-	Cursor, err := coll.Find(ctx, bson.D{{}})
+	Cursor, err := coll.Find(context.Background(), bson.D{{}})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var todos = []*Todo{}
-	for Cursor.Next(ctx) {
+	for Cursor.Next(context.Background()) {
 		var todo Todo
 		Cursor.Decode(&todo)
 		todos = append(todos, &todo)
@@ -33,11 +32,9 @@ func TodoPostHander(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
 
-	client, ctx, cancel := database.Connect()
-	coll := database.GetCollection(client, "todos")
-	defer cancel()
+	coll := database.GetCollection("todos")
 
-	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{Key: "Title", Value: todo.Title}, {Key: "Description", Value: todo.Description}, {Key: "Date", Value: todo.Date}})
+	InsertOneResult, err := coll.InsertOne(context.Backgroun, bson.D{{Key: "Title", Value: todo.Title}, {Key: "Description", Value: todo.Description}, {Key: "Date", Value: todo.Date}})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

@@ -1,8 +1,11 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"time"
 
 	"calendar/database"
 
@@ -11,20 +14,20 @@ import (
 )
 
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
-	client, ctx, cancel := database.Connect()
-	coll := database.GetCollection(client, "users")
-	defer cancel()
+	coll := database.GetCollection("users")
+	start := time.Now()
 
 	filter := bson.D{}
 	opts := options.Find().SetProjection(bson.D{{Key: "Email", Value: 0}})
-	Cursor, err := coll.Find(ctx, filter, opts)
+	Cursor, err := coll.Find(context.Background(), filter, opts)
+	fmt.Println("Time to get data from database: ", time.Since(start))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	var users = []*User{}
-	for Cursor.Next(ctx) {
+	for Cursor.Next(context.Background()) {
 		var user User
 		Cursor.Decode(&user)
 		users = append(users, &user)
@@ -35,11 +38,9 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 func UserPostHandler(w http.ResponseWriter, r *http.Request) {
 	var user User
 	json.NewDecoder(r.Body).Decode(&user)
-	client, ctx, cancel := database.Connect()
-	coll := database.GetCollection(client, "users")
-	defer cancel()
+	coll := database.GetCollection("users")
 
-	InsertOneResult, err := coll.InsertOne(ctx, bson.D{{Key: "Nickname", Value: user.Nickname}, {Key: "Email", Value: user.Email}})
+	InsertOneResult, err := coll.InsertOne(context.Background(), bson.D{{Key: "Nickname", Value: user.Nickname}, {Key: "Email", Value: user.Email}})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

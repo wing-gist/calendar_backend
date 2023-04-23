@@ -2,6 +2,7 @@ package main
 
 import (
 	"calendar/api"
+	"fmt"
 	"net/http"
 )
 
@@ -19,7 +20,9 @@ func main() {
 	mainpage := http.HandlerFunc(api.MainPageHander)
 	userHander := http.HandlerFunc(api.UserHander)
 
-	mux.Handle("/", mainpage);
-	mux.Handle("/users", jsonContentTypeMiddleware(userHander));
+	mux.Handle("/", mainpage)
+	mux.Handle("/users", jsonContentTypeMiddleware(userHander))
+
+	fmt.Println("Server is running on port 8080")
 	http.ListenAndServe(":8080", mux)
 }

@@ -23,6 +23,7 @@ func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
 
 	err = client.Connect(ctx)
 	if err != nil {
@@ -30,8 +31,4 @@ func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
 	}
 
 	return client, ctx, cancel
-}
-
-func GetCollection(client *mongo.Client, collectionName string) *mongo.Collection {
-	return client.Database(os.Getenv("DATABASE_NAME")).Collection(collectionName)
 }
