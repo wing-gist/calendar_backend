@@ -53,6 +53,8 @@ func ValidateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	cookie := http.Cookie{Name: "calendar_JWT", Value: signedAuthToken, Expires: time.Now().Add(time.Minute * 15)}
+	http.SetCookie(w, &cookie)
 	json.NewEncoder(w).Encode(signedAuthToken)
 }
 
