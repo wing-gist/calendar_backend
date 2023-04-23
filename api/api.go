@@ -19,6 +19,8 @@ func UserHander(w http.ResponseWriter, r *http.Request) {
 
 func AuthHander(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
+	case http.MethodGet:
+		ValidateJWT(w, r)
 	case http.MethodPost:
 		ValidateUser(w, r)
 	}

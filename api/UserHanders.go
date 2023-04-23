@@ -81,5 +81,30 @@ func ValidateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(signedAuthToken)
+	cookie := http.Cookie{Name: "MyJWT", Value: signedAuthToken, Expires: time.Now().Add(time.Minute * 15), MaxAge: 0, Secure: false, HttpOnly: false}
+	http.SetCookie(w, &cookie)
+	w.Write([]byte(signedAuthToken))
+}
+
+func ValidateJWT(w http.ResponseWriter, r *http.Request) {
+	cookie, err := r.Cookie("MyJWT")
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	token, err := jwt.ParseWithClaims(cookie.Value, &AuthtokenClaims{}, func(token *jwt.Token) (interface{}, error) {
+		return []byte(os.Getenv("JWT_SECRET")), nil
+	})
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	if token.Valid {
+		json.NewEncoder(w).Encode(token.Claims)
+	} else {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
 }
