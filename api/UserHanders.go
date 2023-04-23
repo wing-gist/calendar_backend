@@ -3,24 +3,18 @@ package api
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-	"time"
 
 	"calendar/database"
 
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func UserGetHandler(w http.ResponseWriter, r *http.Request) {
-	coll := database.GetCollection("users")
-	start := time.Now()
-
 	filter := bson.D{}
-	opts := options.Find().SetProjection(bson.D{{Key: "Email", Value: 0}})
-	Cursor, err := coll.Find(context.Background(), filter, opts)
-	fmt.Println("Time to get data from database: ", time.Since(start))
+
+	Cursor, err := database.Find("users", filter)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
@@ -38,13 +32,34 @@ func UserGetHandler(w http.ResponseWriter, r *http.Request) {
 func UserPostHandler(w http.ResponseWriter, r *http.Request) {
 	var user User
 	json.NewDecoder(r.Body).Decode(&user)
-	coll := database.GetCollection("users")
 
-	InsertOneResult, err := coll.InsertOne(context.Background(), bson.D{{Key: "Nickname", Value: user.Nickname}, {Key: "Email", Value: user.Email}})
+	user.Passsword, _ = bcrypt.GenerateFromPassword(user.Passsword, bcrypt.DefaultCost)
+
+	InsertOneResult, err := database.InsertOne("users", user)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
 	json.NewEncoder(w).Encode(InsertOneResult)
+}
+
+func ValidateUser(w http.ResponseWriter, r *http.Request) {
+	var user User
+	json.NewDecoder(r.Body).Decode(&user)
+
+	filter := bson.D{{"email", user.Email}}
+
+	SingleResult := database.FindOne("users", filter)
+
+	var UserFromDB User
+	SingleResult.Decode(&UserFromDB)
+
+	err := bcrypt.CompareHashAndPassword(UserFromDB.Passsword, user.Passsword)
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	json.NewEncoder(w).Encode(UserFromDB)
 }

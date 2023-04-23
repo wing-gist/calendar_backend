@@ -5,27 +5,14 @@ import (
 )
 
 type User struct {
-	Nickname string `json:"nickname"`
-	Email    string `json:"email"`
+	Nickname  string `json:"nickname" bson:"nickname"`
+	Email     string `json:"email" bson:"email"`
+	Passsword []byte `json:"password" bson:"password"`
 }
 
 type Todo struct {
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Date        time.Time `json:"date"`
-}
-
-type UserDatabase struct {
-	_id      string
-	Nickname string
-	Email    string
-	password string
-}
-
-type TodoDatabase struct {
-	_id         string
-	Title       string
-	Description string
-	Date        time.Time
-	author_id   string
+	Title       string    `json:"title" bson:"title"`
+	Description string    `json:"description" bson:"description"`
+	Date        time.Time `json:"date" bson:"date"`
+	Author_id   string    `json:"author_id" bson:"author_id"`
 }

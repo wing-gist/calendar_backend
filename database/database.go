@@ -30,5 +30,10 @@ func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
 		log.Fatal(err)
 	}
 
+	err = client.Ping(ctx, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	return client, ctx, cancel
 }

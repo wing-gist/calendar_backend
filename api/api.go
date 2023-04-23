@@ -17,6 +17,13 @@ func UserHander(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func AuthHander(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+	case http.MethodPost:
+		ValidateUser(w, r)
+	}
+}
+
 func TodoHander(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
