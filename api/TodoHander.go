@@ -1,23 +1,30 @@
 package api
 
 import (
+	"calendar/database"
 	"context"
 	"encoding/json"
 	"net/http"
-
-	"calendar/database"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func TodoGetHandler(w http.ResponseWriter, r *http.Request) {
-	Cursor, err := database.Find("todos", bson.D{})
+	claim := r.Context().Value("user").(*AuthtokenClaims)
+	if claim == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	filter := bson.D{{"author_id", claim.UserID}}
+	Cursor, err := database.Find("todos", filter)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}
 
-	var todos = []*Todo{}
+	var todos []*Todo
 	for Cursor.Next(context.Background()) {
 		var todo Todo
 		Cursor.Decode(&todo)
@@ -29,10 +36,19 @@ func TodoGetHandler(w http.ResponseWriter, r *http.Request) {
 func TodoPostHander(w http.ResponseWriter, r *http.Request) {
 	var todo Todo
 	json.NewDecoder(r.Body).Decode(&todo)
+	if todo.Title == "" || todo.Description == "" || time.Time.IsZero(todo.DueDate) {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
 
-	coll := database.GetCollection("todos")
+	var claim = r.Context().Value("user").(*AuthtokenClaims)
+	if claim == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+	todo.AuthorID = claim.UserID
 
-	InsertOneResult, err := coll.InsertOne(context.Background(), bson.D{{Key: "Title", Value: todo.Title}, {Key: "Description", Value: todo.Description}, {Key: "Date", Value: todo.Date}})
+	InsertOneResult, err := database.InsertOne("todos", todo)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		return

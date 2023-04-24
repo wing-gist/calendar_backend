@@ -4,7 +4,6 @@ import (
 	"calendar/database"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -95,11 +94,9 @@ func ValidateJWTGaurd(next http.Handler) http.Handler {
 			return
 		}
 
-		fmt.Println(claims)
-
 		ctx := r.Context()
-		ctx = context.WithValue(ctx, "User", claims)
-		r.Clone(ctx)
+		ctx = context.WithValue(ctx, "user", claims)
+		r = r.Clone(ctx)
 
 		next.ServeHTTP(w, r)
 	})
