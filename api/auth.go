@@ -2,7 +2,9 @@ package api
 
 import (
 	"calendar/database"
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	"time"
@@ -58,11 +60,11 @@ func ValidateUser(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(signedAuthToken)
 }
 
-func ValidateJWT(w http.ResponseWriter, r *http.Request) {
+func ValidateJWT(w http.ResponseWriter, r *http.Request) *AuthtokenClaims {
 	cookie, err := r.Cookie("calendar_JWT")
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil
 	}
 
 	token, err := jwt.ParseWithClaims(cookie.Value, &AuthtokenClaims{}, func(token *jwt.Token) (interface{}, error) {
@@ -70,13 +72,35 @@ func ValidateJWT(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil
 	}
 
 	if token.Valid {
-		json.NewEncoder(w).Encode(token.Claims)
+		return token.Claims.(*AuthtokenClaims)
 	} else {
 		w.WriteHeader(http.StatusUnauthorized)
-		return
+		return nil
 	}
+}
+
+func Logout(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{Name: "calendar_JWT", Value: "", Expires: time.Now()}
+	http.SetCookie(w, &cookie)
+}
+
+func ValidateJWTGaurd(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		claims := ValidateJWT(w, r)
+		if claims == nil {
+			return
+		}
+
+		fmt.Println(claims)
+
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, "User", claims)
+		r.Clone(ctx)
+
+		next.ServeHTTP(w, r)
+	})
 }

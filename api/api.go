@@ -1,6 +1,7 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 )
 
@@ -20,9 +21,15 @@ func UserHander(w http.ResponseWriter, r *http.Request) {
 func AuthHander(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
-		ValidateJWT(w, r)
+		Claims := ValidateJWT(w, r)
+		if Claims == nil {
+			return
+		}
+		json.NewEncoder(w).Encode(Claims)
 	case http.MethodPost:
 		ValidateUser(w, r)
+	case http.MethodDelete:
+		Logout(w, r)
 	}
 }
 
