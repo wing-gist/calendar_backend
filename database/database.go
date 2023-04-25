@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"os"
 	"time"
@@ -12,6 +13,7 @@ import (
 )
 
 func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
+	fmt.Println("Connect to mongodb...")
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -34,6 +36,7 @@ func Connect() (*mongo.Client, context.Context, context.CancelFunc) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("mongodb connecting complete!")
 
 	return client, ctx, cancel
 }
