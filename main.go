@@ -18,7 +18,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	mainpage := http.HandlerFunc(api.MainPageHander)
-	userHander := api.ValidateJWTGaurd(http.HandlerFunc(api.UserHander))
+	userHander := http.HandlerFunc(api.UserHander)
 	authHander := http.HandlerFunc(api.AuthHander)
 	todoHander := api.ValidateJWTGaurd(http.HandlerFunc(api.TodoHander))
 
