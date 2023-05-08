@@ -31,3 +31,8 @@ func InsertOne(collectionName string, document interface{}, opts ...*options.Ins
 	coll := GetCollection(collectionName)
 	return coll.InsertOne(context.TODO(), document, opts...)
 }
+
+func DeleteOne(collectionName string, filter interface{}, opts ...*options.DeleteOptions) (*mongo.DeleteResult, error) {
+	coll := GetCollection(collectionName)
+	return coll.DeleteOne(context.Background(), filter, opts...)
+}

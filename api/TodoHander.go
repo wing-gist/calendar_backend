@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func TodoGetHandler(w http.ResponseWriter, r *http.Request) {
@@ -55,4 +56,32 @@ func TodoPostHander(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(InsertOneResult)
+}
+
+func TodoDeleteHander(w http.ResponseWriter, r *http.Request) {
+	var deleteTodo DeleteTodo
+	json.NewDecoder(r.Body).Decode(&deleteTodo)
+	if deleteTodo.ID == primitive.NilObjectID {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	var claim = r.Context().Value("user").(*AuthtokenClaims)
+	if claim == nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		return
+	}
+
+	filter := bson.D{{"author_id", claim.UserID}, {"_id", deleteTodo.ID}}
+	DeleteResult, err := database.DeleteOne("todos", filter)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+	if DeleteResult.DeletedCount == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	json.NewEncoder(w).Encode(DeleteResult)
 }

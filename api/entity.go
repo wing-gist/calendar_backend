@@ -7,15 +7,16 @@ import (
 )
 
 type User struct {
-	ID        primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
-	Nickname  string             `json:"nickname" bson:"nickname"`
-	Email     string             `json:"email" bson:"email"`
-	Passsword []byte             `json:"password" bson:"password"`
+	ID       primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Nickname string             `json:"nickname" bson:"nickname"`
+	Email    string             `json:"email" bson:"email"`
+	Password []byte             `json:"password" bson:"password"`
 }
 
 type Todo struct {
-	Title       string    `json:"title" bson:"title"`
-	Description string    `json:"description" bson:"description"`
-	DueDate     time.Time `json:"due_date" bson:"due_date"`
-	AuthorID    string    `json:"author_id" bson:"author_id"`
+	ID          primitive.ObjectID `json:"_id" bson:"_id,omitempty"`
+	Title       string             `json:"title" bson:"title"`
+	Description string             `json:"description" bson:"description"`
+	DueDate     time.Time          `json:"due_date" bson:"due_date"`
+	AuthorID    string             `json:"author_id" bson:"author_id"`
 }

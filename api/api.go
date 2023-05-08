@@ -15,6 +15,8 @@ func UserHander(w http.ResponseWriter, r *http.Request) {
 		UserGetHandler(w, r)
 	case http.MethodPost:
 		UserPostHandler(w, r)
+	case http.MethodDelete:
+		UserDeleteHander(w, r)
 	}
 }
 
@@ -39,5 +41,7 @@ func TodoHander(w http.ResponseWriter, r *http.Request) {
 		TodoGetHandler(w, r)
 	case http.MethodPost:
 		TodoPostHander(w, r)
+	case http.MethodDelete:
+		TodoDeleteHander(w, r)
 	}
 }

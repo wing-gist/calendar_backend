@@ -22,17 +22,17 @@ type AuthtokenClaims struct {
 }
 
 func ValidateUser(w http.ResponseWriter, r *http.Request) {
-	var user User
-	json.NewDecoder(r.Body).Decode(&user)
+	var login Login
+	json.NewDecoder(r.Body).Decode(&login)
 
-	filter := bson.D{{"email", user.Email}}
+	filter := bson.D{{"email", login.Email}}
 
 	SingleResult := database.FindOne("users", filter)
 
 	var UserFromDB User
 	SingleResult.Decode(&UserFromDB)
 
-	err := bcrypt.CompareHashAndPassword(UserFromDB.Passsword, user.Passsword)
+	err := bcrypt.CompareHashAndPassword(UserFromDB.Password, []byte(login.Password))
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		return
