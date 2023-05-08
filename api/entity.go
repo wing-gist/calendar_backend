@@ -18,5 +18,5 @@ type Todo struct {
 	Title       string             `json:"title" bson:"title"`
 	Description string             `json:"description" bson:"description"`
 	DueDate     time.Time          `json:"due_date" bson:"due_date"`
-	AuthorID    string             `json:"author_id" bson:"author_id"`
+	AuthorID    primitive.ObjectID `json:"author_id" bson:"author_id"`
 }

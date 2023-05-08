@@ -36,3 +36,8 @@ func DeleteOne(collectionName string, filter interface{}, opts ...*options.Delet
 	coll := GetCollection(collectionName)
 	return coll.DeleteOne(context.Background(), filter, opts...)
 }
+
+func DeleteMany(collectionName string, filter interface{}, opts ...*options.DeleteOptions) (*mongo.DeleteResult, error) {
+	coll := GetCollection(collectionName)
+	return coll.DeleteMany(context.Background(), filter, opts...)
+}

@@ -71,6 +71,9 @@ func UserDeleteHander(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	TodoFilter := bson.D{{"author_id", UserFromDB.ID}}
+	database.DeleteMany("todos", TodoFilter)
+
 	DeleteResult, err := database.DeleteOne("users", filter)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

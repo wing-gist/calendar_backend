@@ -11,13 +11,14 @@ import (
 	"github.com/dgrijalva/jwt-go/v4"
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthtokenClaims struct {
-	TokenUUID string `json:"token_uuid"`
-	UserID    string `json:"user_id"`
-	Nickname  string `json:"nickname"`
+	TokenUUID string             `json:"token_uuid"`
+	UserID    primitive.ObjectID `json:"user_id"`
+	Nickname  string             `json:"nickname"`
 	jwt.StandardClaims
 }
 
@@ -40,7 +41,7 @@ func ValidateUser(w http.ResponseWriter, r *http.Request) {
 
 	preAuthToken := AuthtokenClaims{
 		TokenUUID: uuid.NewString(),
-		UserID:    UserFromDB.ID.String(),
+		UserID:    UserFromDB.ID,
 		Nickname:  UserFromDB.Nickname,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: jwt.At(time.Now().Add(time.Minute * 15)),
